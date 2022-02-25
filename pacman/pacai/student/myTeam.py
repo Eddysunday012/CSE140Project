@@ -1,6 +1,7 @@
 from pacai.util import reflection
 import random
 from pacai.agents.capture.capture import CaptureAgent
+from pacai.core.distanceCalculator import Distancer, DistanceCalculator
 
 def createTeam(firstIndex, secondIndex, isRed,
         first = 'pacai.student.myTeam.DummyAgent',
