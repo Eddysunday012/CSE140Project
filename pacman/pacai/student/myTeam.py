@@ -12,8 +12,8 @@ def createTeam(firstIndex, secondIndex, isRed,
     and will be False if the blue team is being created.
     """
 
-    firstAgent = reflection.qualifiedImport(first)
-    secondAgent = reflection.qualifiedImport(second)
+    firstAgent = DummyAgent
+    secondAgent = DummyAgent
 
     return [
         firstAgent(firstIndex),
