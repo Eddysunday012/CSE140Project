@@ -270,8 +270,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
         return random.choice(bestActions)
     
-    # EXPECTIMINIMAX HELPER FUNCTIONS
-
+    # EXPECTIMINIMAX IMPLEMENTATION
     def getActionExpectiminimax(self, gameState):
         # sentinal value
         max = -9999999
@@ -290,7 +289,6 @@ class ReflexCaptureAgent(CaptureAgent):
                 returnAction = action
 
         return returnAction
-
 
     # expectiminimax helper function
     def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance):
@@ -332,8 +330,96 @@ class ReflexCaptureAgent(CaptureAgent):
                         agentIndex + 1, newState, depth, maxDepth, True)
                 return averageVal / len(gameState.getLegalActions(agentIndex))
 
+    # Q LEARNING IMPLEMENTATION
+    def getQValue(self, state, action):
+        """
+        Get the Q-Value for a `pacai.core.gamestate.AbstractGameState`
+        and `pacai.core.directions.Directions`.
+        Should return 0.0 if the (state, action) pair has never been seen.
+        """
+        # check if state action pair in q dictionary already
+        if (state, action) not in self.q.keys():
+            self.q[(state, action)] = 0
 
+        # return the recorded qVal
+        return self.q[(state, action)]
 
+    def getValue(self, state):
+        """
+        Return the value of the best action in a state.
+        I.E., the value of the action that solves: `max_action Q(state, action)`.
+        Where the max is over legal actions.
+        Note that if there are no legal actions, which is the case at the terminal state,
+        you should return a value of 0.0.
+
+        This method pairs with `QLearningAgent.getPolicy`,
+        which returns the actual best action.
+        Whereas this method returns the value of the best action.
+        """
+
+        # check for terminal state
+        if state == 'TERMINAL_STATE':
+            return 0.0
+
+        # check if state has list of legal actions
+        if len(self.getLegalActions(state)) == 0:
+            return 0.0
+
+        # get optimal action and return the state action pair
+        mainAction = self.getPolicy(state)
+        return self.getQValue(state, mainAction)
+
+    def getPolicy(self, state):
+        """
+        Return the best action in a state.
+        I.E., the action that solves: `max_action Q(state, action)`.
+        Where the max is over legal actions.
+        Note that if there are no legal actions, which is the case at the terminal state,
+        you should return a value of None.
+
+        This method pairs with `QLearningAgent.getValue`,
+        which returns the value of the best action.
+        Whereas this method returns the best action itself.
+        """
+        listOfActions = self.getLegalActions(state)
+
+        # check if there any legal actions for state
+        if not listOfActions:
+            return None
+
+        # recording all actions in list
+        mainList = []
+        for action in listOfActions:
+            mainList.append((self.getQValue(state, action), action))
+
+        # getting the maxValue of the list
+        return max(mainList, key=lambda val: val[0])[1]
+
+    def getActionQLearning(self, state):
+        # set up randomness of getting next action
+        randVal = probability.flipCoin(1 - self.getEpsilon())
+        allActions = self.getLegalActions(state)
+
+        # if it has that value return optimal, else return otherwise
+        if randVal:
+            return self.getPolicy(state)
+        else:
+            return choice(allActions)
+
+    def update(self, state, action, nextState, reward):
+        # set up of variable names
+        gamma = self.getGamma()
+        alpha = self.getAlpha()
+        maxQ = self.getValue(nextState)
+
+        # set up of sample
+        sample = reward + gamma * maxQ
+        # getting QValue
+        qVal = self.getQValue(state, action)
+        # calculating qValue
+        self.q[(state, action)] = (1 - alpha) * qVal + (alpha * sample)
+
+    # PRE IMPLEMENTED FUNCTIONS
     def getSuccessor(self, gameState, action):
         """
         Finds the next successor which is a grid position (location tuple).
