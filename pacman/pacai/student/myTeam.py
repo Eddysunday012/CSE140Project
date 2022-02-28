@@ -424,6 +424,14 @@ class ReflexCaptureAgent(CaptureAgent):
         # calculating qValue
         self.q[(state, action)] = (1 - alpha) * qVal + (alpha * sample)
 
+    @abc.abstractmethod
+    def evalFunction(self, state):
+        """
+        Eval Function to define best state possible, defined differently
+        depending on offensive or defensive
+        """
+        pass
+
     # PRE IMPLEMENTED FUNCTIONS
     def getSuccessor(self, gameState, action):
         """
@@ -504,6 +512,9 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             'distanceToFood': -1
         }
 
+    def evalFunction(self, state):
+        pass
+
 class DefensiveReflexAgent(ReflexCaptureAgent):
     """
     A reflex agent that tries to keep its side Pacman-free.
@@ -552,3 +563,6 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
             'stop': -100,
             'reverse': -2
         }
+
+    def evalFunction(self, state):
+        pass
