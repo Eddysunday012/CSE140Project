@@ -5,6 +5,7 @@ import logging
 import os
 import time
 
+
 from pacai.util import reflection
 from pacai.agents.base import BaseAgent
 from pacai.agents.capture.reflex import ReflexCaptureAgent
@@ -12,6 +13,9 @@ from pacai.core.directions import Directions
 # from pacai.agents.capture.capture import CaptureAgent
 from pacai.core import distanceCalculator
 from pacai.util import util
+from pacai.util import reflection
+from pacai.util import probability
+from random import choice
 
 def createTeam(firstIndex, secondIndex, isRed,
         first = 'pacai.student.myTeam.DummyAgent',
@@ -254,6 +258,7 @@ class ReflexCaptureAgent(CaptureAgent):
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
 
+    # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
         """
         Picks among the actions with the highest return from `ReflexCaptureAgent.evaluate`.
