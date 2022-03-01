@@ -17,6 +17,11 @@ from pacai.util import reflection
 from pacai.util import probability
 from random import choice
 
+# ------ for eval function ------
+from pacai.core import distance
+from pacai.bin import pacman
+# ------ for eval function ------
+
 def createTeam(firstIndex, secondIndex, isRed,
         first = 'pacai.student.myTeam.DummyAgent',
         second = 'pacai.student.myTeam.DummyAgent'):
@@ -426,7 +431,7 @@ class ReflexCaptureAgent(CaptureAgent):
         self.q[(state, action)] = (1 - alpha) * qVal + (alpha * sample)
 
     @abc.abstractmethod
-    def evalFunction(self, state):
+    def evalFunction(self, state, action):
         """
         Eval Function to define best state possible, defined differently
         depending on offensive or defensive
@@ -515,8 +520,60 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             'distanceToFood': -1
         }
 
-    def evalFunction(self, state):
-        pass
+    def evalFunction(self, state, action):
+        """
+        not fully implemented yet!
+
+        need to implement:
+        - how to make pacman go towards ghosts when they're scared/
+        after pacman eats a pellet & figure out if they're close enough
+        to see if it's worth it
+        """
+        successorGameState = state.generatePacmanSuccessor(action)  # next game state
+        currPosition = state.getPacmanPosition()  # current position of pacman
+        newPosition = successorGameState.getPacmanPosition()  # new position pacman is in
+        oldFood = state.getFood().asList()  # list of foods to eat @ curr state
+        oldGhostStates = state.getGhostPositions()  # list curr positions of the ghosts
+        addedScore = 0  # score to be added
+ 
+        # store the position of the closest food
+        closestFoodCoords = oldFood[0]
+        # distance b/w you & the closest food
+        foodDistance = distance.manhattan(currPosition, oldFood[0])
+
+        # go through list of all foods and find the one w/ the closest position
+        for i in oldFood:
+            if (distance.manhattan(currPosition, i) < foodDistance):
+                closestFoodCoords = i  # store the position of the closest food
+                foodDistance = distance.manhattan(currPosition, i)  # store the distance
+
+        # distance b/w you & the closest ghost
+        ghostDistance = distance.manhattan(currPosition, oldGhostStates[0])
+
+        # go through list of all ghosts and find the one w/ the closest position
+        for i in oldGhostStates:
+            if (distance.manhattan(currPosition, i) < ghostDistance):
+                ghostDistance = distance.manhattan(currPosition, i)  # store the distance
+
+        # if distance to food is smaller than the previous distance, add food points
+        if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
+            # aka, pacman is closer to food, increase points
+            addedScore += pacman.FOOD_POINTS
+            addedScore += pacman.FOOD_POINTS
+            addedScore += pacman.FOOD_POINTS
+
+        # if you're stopped, keep losing points
+        if (currPosition == newPosition):
+            addedScore -= 50
+        
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # add in stuff to make pacman go towards ghost when they're scared/ ate a pellet
+        # useful stuff:
+        # newGhostStates = successorGameState.getGhostStates()
+        # newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        return successorGameState.getScore() + ghostDistance / (foodDistance * 7) + addedScore
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     """
@@ -567,5 +624,67 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
             'reverse': -2
         }
 
-    def evalFunction(self, state):
-        pass
+    def evalFunction(self, state, action):
+        """
+        not fully implemented yet!
+        
+        thoughts: defensive evaluation function
+        
+        we are the ghost and we try to eat the pacmans? pacmen? who try to
+        eat our food. try to defend territory
+
+        - how to get list of food on our side???
+        - list of current position of enemies (aka pacmans? pacmen?)
+        - make our ghost guard the remaining food when it gets to a certain
+        number? / low
+        - guard areas with more abundance of food?
+        - guard borders where the ghosts on the other side are hanging out
+        but don't cross the border
+        """
+
+        # just copy & pasted- will edit later !!!!!!!!!!!!!!!!!!!!!!
+        successorGameState = state.generatePacmanSuccessor(action)  # next game state
+        currPosition = state.getPacmanPosition()  # current position of pacman
+        newPosition = successorGameState.getPacmanPosition()  # new position pacman is in
+        oldFood = state.getFood().asList()  # list of foods to eat @ curr state
+        oldGhostStates = state.getGhostPositions()  # list curr positions of the ghosts
+        addedScore = 0  # score to be added
+ 
+        # store the position of the closest food
+        closestFoodCoords = oldFood[0]
+        # distance b/w you & the closest food
+        foodDistance = distance.manhattan(currPosition, oldFood[0])
+
+        # go through list of all foods and find the one w/ the closest position
+        for i in oldFood:
+            if (distance.manhattan(currPosition, i) < foodDistance):
+                closestFoodCoords = i  # store the position of the closest food
+                foodDistance = distance.manhattan(currPosition, i)  # store the distance
+
+        # distance b/w you & the closest ghost
+        ghostDistance = distance.manhattan(currPosition, oldGhostStates[0])
+
+        # go through list of all ghosts and find the one w/ the closest position
+        for i in oldGhostStates:
+            if (distance.manhattan(currPosition, i) < ghostDistance):
+                ghostDistance = distance.manhattan(currPosition, i)  # store the distance
+
+        # if distance to food is smaller than the previous distance, add food points
+        if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
+            # aka, pacman is closer to food, increase points
+            addedScore += pacman.FOOD_POINTS
+            addedScore += pacman.FOOD_POINTS
+            addedScore += pacman.FOOD_POINTS
+
+        # if you're stopped, keep losing points
+        if (currPosition == newPosition):
+            addedScore -= 50
+        
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # add in stuff to make ghost go towards ghost when they're scared/ ate a pellet
+        # useful stuff:
+        # newGhostStates = successorGameState.getGhostStates()
+        # newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        return successorGameState.getScore() + ghostDistance / (foodDistance * 7) + addedScore
