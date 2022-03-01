@@ -262,7 +262,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 4
+        self.depth = 3
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -302,7 +302,7 @@ class ReflexCaptureAgent(CaptureAgent):
             newState = gameState.generateSuccessor(self.index, action)
             agentIndex = newState.getLastAgentMoved()
             checkVal = self.expectiMininmax(
-                agentIndex + 1, newState, 0, self.depth, True)
+                agentIndex + 1, newState, self.index, self.depth, True)
             # finding the max value out of all actions
             if checkVal > max:
                 max = checkVal
@@ -314,6 +314,7 @@ class ReflexCaptureAgent(CaptureAgent):
     def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance):
         if gameState.isOver() or depth == maxDepth:
             return self.evalFunction(gameState)
+        
         # chance only if agentIndex is self.index
         if not chance:
             if agentIndex == self.index:
@@ -540,7 +541,9 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         # successorGameState = state.generatePacmanSuccessor()  # next game state
         currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
         oldFood = state.getFood().asList()  # list of foods to eat @ curr state
-        oldGhostStates = state.getGhostPositions()  # list curr positions of the ghosts
+        oldGhostStates = []  # list curr positions of the ghosts
+        for agent in self.getOpponents(state):
+            oldGhostStates.append(state.getAgentState(agent).getPosition())
         addedScore = 0  # score to be added
  
         # store the position of the closest food
@@ -654,7 +657,9 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
         currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
         # newPosition = successorGameState.getPacmanPosition()  # new position pacman is in
         oldFood = state.getFood().asList()  # list of foods to eat @ curr state
-        oldGhostStates = state.getGhostPositions()  # list curr positions of the ghosts
+        oldGhostStates = []  # list curr positions of the ghosts
+        for agent in self.getOpponents(state):
+            oldGhostStates.append(state.getAgentState(agent).getPosition())
         addedScore = 0  # score to be added
  
         # store the position of the closest food
