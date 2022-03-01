@@ -270,16 +270,18 @@ class ReflexCaptureAgent(CaptureAgent):
         Picks among the actions with the highest return from `ReflexCaptureAgent.evaluate`.
         """
 
-        actions = gameState.getLegalActions(self.index)
+        # actions = gameState.getLegalActions(self.index)
 
-        start = time.time()
-        values = [self.evaluate(gameState, a) for a in actions]
-        logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
+        # start = time.time()
+        # values = [self.evaluate(gameState, a) for a in actions]
+        # logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
 
-        maxValue = max(values)
-        bestActions = [a for a, v in zip(actions, values) if v == maxValue]
+        # maxValue = max(values)
+        # bestActions = [a for a, v in zip(actions, values) if v == maxValue]
 
-        return random.choice(bestActions)
+        # return random.choice(bestActions)
+
+        return self.getActionExpectiminimax(gameState)
     
     # EXPECTIMINIMAX IMPLEMENTATION
     def getActionExpectiminimax(self, gameState):
@@ -303,9 +305,8 @@ class ReflexCaptureAgent(CaptureAgent):
 
     # expectiminimax helper function
     def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance):
-        evalFunc = self.getEvaluationFunction()
         if gameState.isOver() or depth == maxDepth:
-            return evalFunc(gameState)
+            return self.evalFunction(gameState)
         # chance only if agentIndex is self.index
         if not chance:
             if agentIndex == self.index:
