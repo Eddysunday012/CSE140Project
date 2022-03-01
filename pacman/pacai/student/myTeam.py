@@ -439,7 +439,7 @@ class ReflexCaptureAgent(CaptureAgent):
         self.q[(state, action)] = (1 - alpha) * qVal + (alpha * sample)
 
     @abc.abstractmethod
-    def evalFunction(self, state, action):
+    def evalFunction(self, state):
         """
         Eval Function to define best state possible, defined differently
         depending on offensive or defensive
@@ -528,7 +528,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             'distanceToFood': -1
         }
 
-    def evalFunction(self, state, action):
+    def evalFunction(self, state):
         """
         not fully implemented yet!
 
@@ -537,9 +537,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         after pacman eats a pellet & figure out if they're close enough
         to see if it's worth it
         """
-        successorGameState = state.generatePacmanSuccessor(action)  # next game state
-        currPosition = state.getPacmanPosition()  # current position of pacman
-        newPosition = successorGameState.getPacmanPosition()  # new position pacman is in
+        # successorGameState = state.generatePacmanSuccessor()  # next game state
+        currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
         oldFood = state.getFood().asList()  # list of foods to eat @ curr state
         oldGhostStates = state.getGhostPositions()  # list curr positions of the ghosts
         addedScore = 0  # score to be added
@@ -564,15 +563,15 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 ghostDistance = distance.manhattan(currPosition, i)  # store the distance
 
         # if distance to food is smaller than the previous distance, add food points
-        if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
-            # aka, pacman is closer to food, increase points
-            addedScore += pacman.FOOD_POINTS
-            addedScore += pacman.FOOD_POINTS
-            addedScore += pacman.FOOD_POINTS
+        # if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
+        #     # aka, pacman is closer to food, increase points
+        #     addedScore += pacman.FOOD_POINTS
+        #     addedScore += pacman.FOOD_POINTS
+        #     addedScore += pacman.FOOD_POINTS
 
         # if you're stopped, keep losing points
-        if (currPosition == newPosition):
-            addedScore -= 50
+        # if (currPosition == newPosition):
+        #     addedScore -= 50
         
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # add in stuff to make pacman go towards ghost when they're scared/ ate a pellet
@@ -581,7 +580,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         # newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        return successorGameState.getScore() + ghostDistance / (foodDistance * 7) + addedScore
+        return state.getScore() + ghostDistance / (foodDistance * 7) + addedScore
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     """
@@ -632,7 +631,7 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
             'reverse': -2
         }
 
-    def evalFunction(self, state, action):
+    def evalFunction(self, state):
         """
         not fully implemented yet!
         
@@ -651,9 +650,9 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
         """
 
         # just copy & pasted- will edit later !!!!!!!!!!!!!!!!!!!!!!
-        successorGameState = state.generatePacmanSuccessor(action)  # next game state
-        currPosition = state.getPacmanPosition()  # current position of pacman
-        newPosition = successorGameState.getPacmanPosition()  # new position pacman is in
+        # successorGameState = state.generatePacmanSuccessor()  # next game state
+        currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
+        # newPosition = successorGameState.getPacmanPosition()  # new position pacman is in
         oldFood = state.getFood().asList()  # list of foods to eat @ curr state
         oldGhostStates = state.getGhostPositions()  # list curr positions of the ghosts
         addedScore = 0  # score to be added
@@ -678,15 +677,15 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
                 ghostDistance = distance.manhattan(currPosition, i)  # store the distance
 
         # if distance to food is smaller than the previous distance, add food points
-        if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
-            # aka, pacman is closer to food, increase points
-            addedScore += pacman.FOOD_POINTS
-            addedScore += pacman.FOOD_POINTS
-            addedScore += pacman.FOOD_POINTS
+        # if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
+        #     # aka, pacman is closer to food, increase points
+        #     addedScore += pacman.FOOD_POINTS
+        #     addedScore += pacman.FOOD_POINTS
+        #     addedScore += pacman.FOOD_POINTS
 
         # if you're stopped, keep losing points
-        if (currPosition == newPosition):
-            addedScore -= 50
+        # if (currPosition == newPosition):
+        #     addedScore -= 50
         
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # add in stuff to make ghost go towards ghost when they're scared/ ate a pellet
@@ -695,4 +694,4 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
         # newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        return successorGameState.getScore() + ghostDistance / (foodDistance * 7) + addedScore
+        return state.getScore() + ghostDistance / (foodDistance * 7) + addedScore
