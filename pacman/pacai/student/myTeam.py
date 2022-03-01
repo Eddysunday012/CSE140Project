@@ -270,6 +270,8 @@ class ReflexCaptureAgent(CaptureAgent):
         Picks among the actions with the highest return from `ReflexCaptureAgent.evaluate`.
         """
 
+        # ORIGINAL IMPLEMENTATION 
+
         # actions = gameState.getLegalActions(self.index)
 
         # start = time.time()
@@ -281,7 +283,12 @@ class ReflexCaptureAgent(CaptureAgent):
 
         # return random.choice(bestActions)
 
+
+        # EXPECTIMINIMAX IMPLEMENTATION
         return self.getActionExpectiminimax(gameState)
+
+        # Q LEARNING IMPLEMENTATION
+        # return self.getActionQLearning(gameState)
     
     # EXPECTIMINIMAX IMPLEMENTATION
     def getActionExpectiminimax(self, gameState):
