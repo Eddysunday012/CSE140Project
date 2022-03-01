@@ -257,6 +257,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
+        self.depth = 4
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -284,10 +285,10 @@ class ReflexCaptureAgent(CaptureAgent):
             # skip stop action
             if action == Directions.STOP:
                 continue
-            newState = gameState.generateSuccessor(0, action)
+            newState = gameState.generateSuccessor(self.index, action)
             agentIndex = newState.getLastAgentMoved()
             checkVal = self.expectiMininmax(
-                agentIndex + 1, newState, 0, self.getTreeDepth(), True)
+                agentIndex + 1, newState, 0, self.depth, True)
             # finding the max value out of all actions
             if checkVal > max:
                 max = checkVal
@@ -300,9 +301,9 @@ class ReflexCaptureAgent(CaptureAgent):
         evalFunc = self.getEvaluationFunction()
         if gameState.isOver() or depth == maxDepth:
             return evalFunc(gameState)
-        # chance only if agentIndex if 0
+        # chance only if agentIndex is self.index
         if not chance:
-            if agentIndex == 0:
+            if agentIndex == self.index:
                 maxVal = -999999
                 for action in gameState.getLegalActions(agentIndex):
                     # skips the stop action
@@ -492,6 +493,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
     def getFeatures(self, gameState, action):
         features = {}
+        print(gameState.getLegalActions(self.index))
+        print(gameState.getNumAgents())
         successor = self.getSuccessor(gameState, action)
         features['successorScore'] = self.getScore(successor)
 
