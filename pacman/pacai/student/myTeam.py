@@ -583,8 +583,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             addedScore += (1/foodDistance) * 6
         # else:
         #     addedScore + 100
-        
-
 
         # distance b/w you & the closest ghost
         ghostDistance = distance.manhattan(currPosition, oldGhostStates[0])
