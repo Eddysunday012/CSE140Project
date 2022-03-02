@@ -597,7 +597,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
        
         # go towards ghost if scared & close & enough time
-        scaredTime = [ghostState.scaredTimer for ghostState in currGhostStates]
+        scaredTime = [ghostState.scaredTimer for ghostState in oldGhostStates]
         scared = min(scaredTime)
         if (ghostDistance < 2):
             if (scared < 2):
@@ -605,13 +605,13 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             else:
                 addedScore += 10000
         
-        addedScore += (1/ghostDistance) * 5
+        addedScore += ghostDistance * 5
 
         #if you're stopped, keep losing points
         if (currPosition == prevPosition):
             addedScore -= 50
 
-        return state.getScore() + addedScore
+        return state.getScore() + + ghostDistance / (foodDistance * 7) + addedScore
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     """
