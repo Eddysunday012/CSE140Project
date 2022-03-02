@@ -286,15 +286,15 @@ class ReflexCaptureAgent(CaptureAgent):
         #IMPLEMENTING WITH JUST EVAL FUNCTIONS
         actions = gameState.getLegalActions(self.index)
 
-        # if "Stop" in actions:
-        #     actions.remove("Stop")
+        if "Stop" in actions:
+            actions.remove("Stop")
 
         start = time.time()
         values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
         logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
 
         maxValue = max(values)
-        print("values: ", values, "actions: ", actions)
+        print("values: ", values, "MAXVALUE: ", maxValue)
         bestActions = [a for a, v in zip(actions, values) if v == maxValue]
         print(bestActions)
 
