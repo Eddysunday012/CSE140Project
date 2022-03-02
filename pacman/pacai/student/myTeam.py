@@ -262,7 +262,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 3
+        self.depth = 2
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -283,9 +283,23 @@ class ReflexCaptureAgent(CaptureAgent):
 
         # return random.choice(bestActions)
 
+        #IMPLEMENTING WITH JUST EVAL FUNCTIONS
+        actions = gameState.getLegalActions(self.index)
+
+        start = time.time()
+        values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions if (a != "Stop")]
+        logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
+
+        maxValue = max(values)
+        print("values: ", values, "MAXVALUE: ", maxValue)
+        bestActions = [a for a, v in zip(actions, values) if v == maxValue]
+        print(bestActions)
+
+        return random.choice(bestActions)
+
 
         # EXPECTIMINIMAX IMPLEMENTATION
-        return self.getActionExpectiminimax(gameState)
+        # return self.getActionExpectiminimax(gameState)
 
         # Q LEARNING IMPLEMENTATION
         # return self.getActionQLearning(gameState)
@@ -295,10 +309,12 @@ class ReflexCaptureAgent(CaptureAgent):
         # sentinal value
         max = -9999999
         returnAction = ''
-        for action in gameState.getLegalActions():
+        # print(gameState.getLegalActions())
+        for action in gameState.getLegalActions(self.index):
             # skip stop action
             if action == Directions.STOP:
                 continue
+            # print(action, gameState.getLegalActions(self.index))
             newState = gameState.generateSuccessor(self.index, action)
             agentIndex = newState.getLastAgentMoved()
             checkVal = self.expectiMininmax(
@@ -307,7 +323,7 @@ class ReflexCaptureAgent(CaptureAgent):
             if checkVal > max:
                 max = checkVal
                 returnAction = action
-
+        # print("done")
         return returnAction
 
     # expectiminimax helper function
