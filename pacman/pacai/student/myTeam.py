@@ -286,15 +286,15 @@ class ReflexCaptureAgent(CaptureAgent):
         #IMPLEMENTING WITH JUST EVAL FUNCTIONS
         actions = gameState.getLegalActions(self.index)
 
-        if "Stop" in actions:
-            actions.remove("Stop")
+        # if "Stop" in actions:
+        #     actions.remove("Stop")
 
         start = time.time()
         values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
         logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
 
         maxValue = max(values)
-        print("values: ", values, "MAXVALUE: ", maxValue)
+        print("values: ", values, "actions: ", actions)
         bestActions = [a for a, v in zip(actions, values) if v == maxValue]
         print(bestActions)
 
@@ -579,10 +579,10 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 closestFoodCoords = i  # store the position of the closest food
                 foodDistance = self.getMazeDistance(currPosition, i)  # store the distance
 
-        # if foodDistance != 0:
-            addedScore += (1/foodDistance) * 6
-        # else:
-        #     addedScore + 100
+        if foodDistance != 0:
+            addedScore += (1/foodDistance) * 20
+        else:
+            addedScore + 100
         
 
 
