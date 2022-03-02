@@ -563,6 +563,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         # successorGameState = state.generatePacmanSuccessor()  # next game state
         currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
         oldFood = self.getFood(state).asList()  # list of foods to eat @ curr state
+        oldState = self.getPreviousObservation()
+        if (oldState != None):
+            oldoldFood = self.getFood(oldState).asList()
+        else:
+            oldoldFood = oldFood
         oldGhostStates = []  # list curr positions of the ghosts
         for agent in self.getOpponents(state):
             oldGhostStates.append(state.getAgentState(agent).getPosition())
@@ -582,19 +587,22 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         if foodDistance != 0:
             addedScore += (1/foodDistance) * 20
         else:
-            addedScore + 100
+            addedScore += 100
+
+        if len(oldFood) < len(oldoldFood):
+            addedScore += 100
         
 
 
         # distance b/w you & the closest ghost
-        ghostDistance = distance.manhattan(currPosition, oldGhostStates[0])
+        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
 
         # go through list of all ghosts and find the one w/ the closest position
         for i in oldGhostStates:
             if (self.getMazeDistance(currPosition, i) < ghostDistance):
                 ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
 
-        # addedScore += ghostDistance * 3
+        addedScore += ghostDistance * 3
 
         # if distance to food is smaller than the previous distance, add food points
         # if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
