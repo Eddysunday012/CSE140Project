@@ -284,28 +284,28 @@ class ReflexCaptureAgent(CaptureAgent):
         # return random.choice(bestActions)
 
         #IMPLEMENTING WITH JUST EVAL FUNCTIONS
-        actions = gameState.getLegalActions(self.index)
+        # actions = gameState.getLegalActions(self.index)
 
-        if "Stop" in actions:
-            actions.remove("Stop")
+        # if "Stop" in actions:
+        #     actions.remove("Stop")
 
-        start = time.time()
-        values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
-        logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
+        # start = time.time()
+        # values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
+        # logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
 
-        maxValue = max(values)
-        print("values: ", values, "MAXVALUE: ", maxValue)
-        bestActions = [a for a, v in zip(actions, values) if v == maxValue]
-        print(bestActions)
+        # maxValue = max(values)
+        # print("values: ", values, "MAXVALUE: ", maxValue)
+        # bestActions = [a for a, v in zip(actions, values) if v == maxValue]
+        # print(bestActions)
 
-        # if "Stop" in bestActions:
-        #     bestActions.remove("Stop")
+        # # if "Stop" in bestActions:
+        # #     bestActions.remove("Stop")
 
-        return random.choice(bestActions)
+        # return random.choice(bestActions)
 
 
         # EXPECTIMINIMAX IMPLEMENTATION
-        # return self.getActionExpectiminimax(gameState)
+        return self.getActionExpectiminimax(gameState)
 
         # Q LEARNING IMPLEMENTATION
         # return self.getActionQLearning(gameState)
@@ -329,12 +329,13 @@ class ReflexCaptureAgent(CaptureAgent):
             if checkVal > max:
                 max = checkVal
                 returnAction = action
-        # print("done")
+        print(returnAction)
         return returnAction
 
     # expectiminimax helper function
     def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance):
         if gameState.isOver() or depth == maxDepth:
+            # print("here")
             return self.evalFunction(gameState)
         
         # chance only if agentIndex is self.index
@@ -564,10 +565,13 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
         oldFood = self.getFood(state).asList()  # list of foods to eat @ curr state
         oldState = self.getPreviousObservation()
+
+        # Getting location of previosu state's food
         if (oldState != None):
             oldoldFood = self.getFood(oldState).asList()
         else:
             oldoldFood = oldFood
+
         oldGhostStates = []  # list curr positions of the ghosts
         for agent in self.getOpponents(state):
             oldGhostStates.append(state.getAgentState(agent).getPosition())
@@ -602,7 +606,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             if (self.getMazeDistance(currPosition, i) < ghostDistance):
                 ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
 
-        addedScore += ghostDistance * 3
+        addedScore += (1/ghostDistance) * 5
 
         # if distance to food is smaller than the previous distance, add food points
         # if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
