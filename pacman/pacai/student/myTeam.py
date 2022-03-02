@@ -589,12 +589,12 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             addedScore += 100
         
         # distance b/w you & the closest ghost
-        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
+        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0].getPosition())
 
         # go through list of all ghosts and find the one w/ the closest position
         for i in oldGhostStates:
-            if (self.getMazeDistance(currPosition, i) < ghostDistance):
-                ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
+            if (self.getMazeDistance(currPosition, i.getPosition()) < ghostDistance):
+                ghostDistance = self.getMazeDistance(currPosition, i.getPosition())  # store the distance
        
         # go towards ghost if scared & close & enough time
         scaredTime = [ghostState.scaredTimer for ghostState in oldGhostStates]
