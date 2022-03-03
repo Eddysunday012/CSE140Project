@@ -794,6 +794,10 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
                 else: # if pac is close and ur not scared, increase score
                     addedScore += 10000
             
-            addedScore += (1/pacDistance) * 5 # smaller the distance, the more is added
-        
+            addedScore += (1/pacDistance) * 2 # smaller the distance, the more is added
+
+            if (pacDistance == 0 and not currState.isScared()):
+                addedScore += 100000000
+
         return state.getScore() + addedScore
+        
