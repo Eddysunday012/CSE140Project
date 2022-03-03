@@ -795,3 +795,5 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
                     addedScore += 10000
             
             addedScore += (1/pacDistance) * 5 # smaller the distance, the more is added
+        
+        return state.getScore() + addedScore
