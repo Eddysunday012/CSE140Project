@@ -284,28 +284,28 @@ class ReflexCaptureAgent(CaptureAgent):
         # return random.choice(bestActions)
 
         #IMPLEMENTING WITH JUST EVAL FUNCTIONS
-        # actions = gameState.getLegalActions(self.index)
+        actions = gameState.getLegalActions(self.index)
 
-        # if "Stop" in actions:
-        #     actions.remove("Stop")
+        if "Stop" in actions:
+            actions.remove("Stop")
 
-        # start = time.time()
-        # values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
-        # logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
+        start = time.time()
+        values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
+        logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
 
-        # maxValue = max(values)
-        # print("values: ", values, "MAXVALUE: ", maxValue)
-        # bestActions = [a for a, v in zip(actions, values) if v == maxValue]
-        # print(bestActions)
+        maxValue = max(values)
+        print("values: ", values, "MAXVALUE: ", maxValue)
+        bestActions = [a for a, v in zip(actions, values) if v == maxValue]
+        print(bestActions)
 
-        # # if "Stop" in bestActions:
-        # #     bestActions.remove("Stop")
+        # if "Stop" in bestActions:
+        #     bestActions.remove("Stop")
 
-        # return random.choice(bestActions)
+        return max(bestActions)
 
 
         # EXPECTIMINIMAX IMPLEMENTATION
-        return self.getActionExpectiminimax(gameState)
+        # return self.getActionExpectiminimax(gameState)
 
         # Q LEARNING IMPLEMENTATION
         # return self.getActionQLearning(gameState)
@@ -554,7 +554,9 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
     def evalFunction(self, state):
         oldState = self.getPreviousObservation()
-        prevPosition = lastState.getAgentState(self.index).getPosition() # prev pos of pacman
+        if oldState == None:
+            return 0
+        prevPosition = oldState.getAgentState(self.index).getPosition() # prev pos of pacman
         currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
         oldFood = self.getFood(state).asList()  # list of foods to eat @ curr state
         
@@ -565,8 +567,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             oldoldFood = oldFood
 
         oldGhostStates = []  # list curr positions of the ghosts
+        oldGhostStates2 = []
         for agent in self.getOpponents(state):
             oldGhostStates.append(state.getAgentState(agent).getPosition())
+            oldGhostStates2.append(state.getAgentState(agent))
+
         addedScore = 0  # score to be added
  
         # store the position of the closest food
@@ -589,21 +594,21 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             addedScore += 100
         
         # distance b/w you & the closest ghost
-        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0].getPosition())
+        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
 
         # go through list of all ghosts and find the one w/ the closest position
         for i in oldGhostStates:
-            if (self.getMazeDistance(currPosition, i.getPosition()) < ghostDistance):
-                ghostDistance = self.getMazeDistance(currPosition, i.getPosition())  # store the distance
+            if (self.getMazeDistance(currPosition, i) < ghostDistance):
+                ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
        
         # go towards ghost if scared & close & enough time
-        scaredTime = [ghostState.scaredTimer for ghostState in oldGhostStates]
-        scared = min(scaredTime)
-        if (ghostDistance < 2):
-            if (scared < 2):
-                addedScore -= 10000
-            else:
-                addedScore += 10000
+        # scaredTime = [ghostState.getScaredTimer() for ghostState in oldGhostStates2]
+        # scared = min(scaredTime)
+        # if (ghostDistance < 2):
+        #     if (scared < 2):
+        #         addedScore -= 10000
+        #     else:
+        #         addedScore += 10000
         
         addedScore += ghostDistance * 5
 
