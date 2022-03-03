@@ -777,22 +777,21 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
                 oldGhostStates.append(state.getAgentState(agent).getPosition())
                 oldGhostStates2.append(state.getAgentState(agent))
 
-        # distance b/w you & the closest pacman
-        pacDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
+        if (len(oldGhostStates2) != 0):
+            # distance b/w you & the closest pacman
+            pacDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
 
-        # go through list of all pacmen and find the one w/ the closest position
-        for i in oldGhostStates:
-            if (self.getMazeDistance(currPosition, i) < pacDistance):
-                pacDistance = self.getMazeDistance(currPosition, i)  # store the distance
+            # go through list of all pacmen and find the one w/ the closest position
+            for i in oldGhostStates:
+                if (self.getMazeDistance(currPosition, i) < pacDistance):
+                    pacDistance = self.getMazeDistance(currPosition, i)  # store the distance
 
-        scaredTime = [scaredState.getScaredTimer() for scaredState in currState]
-        scared = min(scaredTime)
-        if (pacDistance < 3):
-            if (scared < 3): # if pac is close and ur scared, decrease score
-                addedScore -= 10000
-            else: # if pac is close and ur not scared, increase score
-                addedScore += 10000
-
-        addedScore += (1/pacDistance) * 5 # smaller the distance, the more is added
-
-        return state.getScore() + addedScore
+            scaredTime = [scaredState.getScaredTimer() for scaredState in currState]
+            scared = min(scaredTime)
+            if (pacDistance < 3):
+                if (scared < 3): # if pac is close and ur scared, decrease score
+                    addedScore -= 10000
+                else: # if pac is close and ur not scared, increase score
+                    addedScore += 10000
+            
+            addedScore += (1/pacDistance) * 5 # smaller the distance, the more is added
