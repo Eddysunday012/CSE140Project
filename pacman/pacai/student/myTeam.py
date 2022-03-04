@@ -35,7 +35,7 @@ def createTeam(firstIndex, secondIndex, isRed,
 
     # This is how we should call the agents in the file -J
     firstAgent = OffensiveReflexAgent
-    secondAgent = OffensiveReflexAgent2
+    secondAgent = DefensiveReflexAgent
 
     return [
         firstAgent(firstIndex),
@@ -285,28 +285,28 @@ class ReflexCaptureAgent(CaptureAgent):
         # return random.choice(bestActions)
 
         #IMPLEMENTING WITH JUST EVAL FUNCTIONS
-        actions = gameState.getLegalActions(self.index)
+        # actions = gameState.getLegalActions(self.index)
 
-        if "Stop" in actions:
-            actions.remove("Stop")
+        # if "Stop" in actions:
+        #     actions.remove("Stop")
 
-        start = time.time()
-        values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
-        logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
+        # start = time.time()
+        # values = [self.evalFunction(gameState.generateSuccessor(self.index, a)) for a in actions]
+        # logging.debug('evaluate() time for agent %d: %.4f' % (self.index, time.time() - start))
 
-        maxValue = max(values)
-        print("values: ", values, "MAXVALUE: ", maxValue)
-        bestActions = [a for a, v in zip(actions, values) if v == maxValue]
-        print(bestActions)
+        # maxValue = max(values)
+        # print("values: ", values, "MAXVALUE: ", maxValue)
+        # bestActions = [a for a, v in zip(actions, values) if v == maxValue]
+        # print(bestActions)
 
         # if "Stop" in bestActions:
         #     bestActions.remove("Stop")
 
-        return random.choice(bestActions)
+        # return random.choice(bestActions)
 
 
         # EXPECTIMINIMAX IMPLEMENTATION
-        # return self.getActionExpectiminimax(gameState)
+        return self.getActionExpectiminimax(gameState)
 
         # Q LEARNING IMPLEMENTATION
         # return self.getActionQLearning(gameState)
@@ -324,8 +324,14 @@ class ReflexCaptureAgent(CaptureAgent):
             # print(action, gameState.getLegalActions(self.index))
             newState = gameState.generateSuccessor(self.index, action)
             agentIndex = newState.getLastAgentMoved()
-            checkVal = self.expectiMininmax(
-                agentIndex + 1, newState, self.index, self.depth, True)
+
+            if agentIndex == gameState.getNumAgents()-1:
+                checkVal = self.expectiMininmax(
+                    0, newState, self.index, self.depth, True)
+            else:
+                checkVal = self.expectiMininmax(
+                    agentIndex + 1, newState, self.index, self.depth, True)
+            
             # finding the max value out of all actions
             if checkVal > max:
                 max = checkVal
@@ -350,7 +356,7 @@ class ReflexCaptureAgent(CaptureAgent):
                     newState = gameState.generateSuccessor(agentIndex, action)
                     # for this section only finding the max value
                     maxVal = max(maxVal, self.expectiMininmax(
-                        agentIndex + 1, newState, depth, maxDepth, True))
+                        agentIndex + 1, newState, depth + 1, maxDepth, True))
                 return maxVal
         else:
             # dependent on two possible states
