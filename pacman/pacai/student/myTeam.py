@@ -1,3 +1,4 @@
+from queue import Empty
 import random
 import abc
 import glob
@@ -34,7 +35,7 @@ def createTeam(firstIndex, secondIndex, isRed,
 
     # This is how we should call the agents in the file -J
     firstAgent = OffensiveReflexAgent
-    secondAgent = DefensiveReflexAgent
+    secondAgent = OffensiveReflexAgent2
 
     return [
         firstAgent(firstIndex),
@@ -801,3 +802,222 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
         return state.getScore() + addedScore
         
+class OffensiveReflexAgent2(ReflexCaptureAgent):
+    """
+    A reflex agent that seeks food.
+    This agent will give you an idea of what an offensive agent might look like,
+    but it is by no means the best or only way to build an offensive agent.
+    """
+
+    def __init__(self, index, **kwargs):
+        super().__init__(index)
+
+    def getFeatures(self, gameState, action):
+        features = {}
+        print(gameState.getLegalActions(self.index))
+        print(gameState.getNumAgents())
+        successor = self.getSuccessor(gameState, action)
+        features['successorScore'] = self.getScore(successor)
+
+        # Compute distance to the nearest food.
+        foodList = self.getFood(successor).asList()
+
+        # This should always be True, but better safe than sorry.
+        if (len(foodList) > 0):
+            myPos = successor.getAgentState(self.index).getPosition()
+            minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
+            features['distanceToFood'] = minDistance
+
+        return features
+
+    def getWeights(self, gameState, action):
+        return {
+            'successorScore': 100,
+            'distanceToFood': -1
+        }
+
+    def evalFunction(self, state):
+        # oldState = self.getPreviousObservation()
+        # if oldState == None:
+        #     return 0
+        # prevPosition = oldState.getAgentState(self.index).getPosition() # prev pos of pacman
+        # currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
+        # oldFood = self.getFood(state).asList()  # list of foods to eat @ curr state
+        
+        # # Getting location of previous state's food
+        # if (oldState != None):
+        #     oldoldFood = self.getFood(oldState).asList()
+        # else:
+        #     oldoldFood = oldFood
+
+        # oldGhostStates = []  # list curr positions of the ghosts
+        # oldGhostStates2 = []
+        # for agent in self.getOpponents(state):
+        #     oldGhostStates.append(state.getAgentState(agent).getPosition())
+        #     oldGhostStates2.append(state.getAgentState(agent))
+
+        # addedScore = 0  # score to be added
+ 
+        # # store the position of the closest food
+        # closestFoodCoords = oldFood[0]
+        # # distance b/w you & the closest food
+        # foodDistance = self.getMazeDistance(currPosition, oldFood[0])
+
+        # # go through list of all foods and find the one w/ the closest position
+        # for i in oldFood:
+        #     if (self.getMazeDistance(currPosition, i) < foodDistance):
+        #         closestFoodCoords = i  # store the position of the closest food
+        #         foodDistance = self.getMazeDistance(currPosition, i)  # store the distance
+
+        # if foodDistance != 0:
+        #     addedScore += (1/foodDistance) * 20
+        # else:
+        #     addedScore += 100
+
+        # if len(oldFood) < len(oldoldFood):
+        #     addedScore += 100
+        
+        # # distance b/w you & the closest ghost
+        # ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
+
+        # # go through list of all ghosts and find the one w/ the closest position
+        # for i in oldGhostStates:
+        #     if (self.getMazeDistance(currPosition, i) < ghostDistance):
+        #         ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
+       
+        # # go towards ghost if scared & close & enough time
+        # # scaredTime = [ghostState.getScaredTimer() for ghostState in oldGhostStates2]
+        # # scared = min(scaredTime)
+        # # if (ghostDistance < 2):
+        # #     if (scared < 2):
+        # #         addedScore -= 10000
+        # #     else:
+        # #         addedScore += 10000
+        
+        # addedScore += ghostDistance * 2
+
+        # #if you're stopped, keep losing points
+        # if (currPosition == prevPosition):
+        #     addedScore -= 50
+
+        # return state.getScore() + + ghostDistance / (foodDistance * 7) + addedScore
+        
+        
+        currPosition = state.getAgentState(self.index).getPosition()  # current position of pacman
+        oldCapsules = self.getCapsules(state)  # list of foods to eat @ curr state
+        oldState = self.getPreviousObservation()
+
+        if oldState == None:
+            return 0
+
+        if len(oldCapsules) != 0:
+            # Getting location of previosu state's food
+            if (oldState != None):
+                oldoldCapsules = self.getCapsules(oldState)
+            else:
+                oldoldCapsules = oldCapsules
+
+            addedScore = 0  # score to be added
+    
+            # store the position of the closest food
+            closestFoodCoords = oldCapsules[0]
+            # distance b/w you & the closest food
+            foodDistance = self.getMazeDistance(currPosition, oldCapsules[0])
+
+            # go through list of all foods and find the one w/ the closest position
+            for i in oldCapsules:
+                if (self.getMazeDistance(currPosition, i) < foodDistance):
+                    closestFoodCoords = i  # store the position of the closest food
+                    foodDistance = self.getMazeDistance(currPosition, i)  # store the distance
+
+            if foodDistance != 0:
+                addedScore += (1/foodDistance) * 20
+            else:
+                addedScore += 100
+
+            if len(oldCapsules) < len(oldoldCapsules):
+                addedScore += 100
+        
+        
+        
+        ##=============================================================================
+        
+        
+        else:
+            oldFood = self.getFood(state).asList()  # list of foods to eat @ curr state
+            oldState = self.getPreviousObservation()
+
+            if oldState == None:
+                return 0
+
+            # Getting location of previosu state's food
+            if (oldState != None):
+                oldoldFood = self.getFood(oldState).asList()
+            else:
+                oldoldFood = oldFood
+
+            addedScore = 0  # score to be added
+    
+            # store the position of the closest food
+            closestFoodCoords = oldFood[0]
+            # distance b/w you & the closest food
+            foodDistance = self.getMazeDistance(currPosition, oldFood[0])
+
+            # go through list of all foods and find the one w/ the closest position
+            for i in oldFood:
+                if (self.getMazeDistance(currPosition, i) < foodDistance):
+                    closestFoodCoords = i  # store the position of the closest food
+                    foodDistance = self.getMazeDistance(currPosition, i)  # store the distance
+
+            if foodDistance != 0:
+                addedScore += (1/foodDistance) * 20
+            else:
+                addedScore += 100
+
+            if len(oldFood) < len(oldoldFood):
+                addedScore += 100
+        
+        oldGhostStates = []  # list curr positions of the ghosts
+        oldGhostStates2 = []
+        for agent in self.getOpponents(state):
+            if state.getAgentState(agent).isGhost():
+                oldGhostStates.append(state.getAgentState(agent).getPosition())
+                oldGhostStates2.append(state.getAgentState(agent))
+
+        # distance b/w you & the closest ghost
+        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
+
+        # go through list of all ghosts and find the one w/ the closest position
+        for i in oldGhostStates:
+            if (self.getMazeDistance(currPosition, i) < ghostDistance):
+                ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
+
+        scaredTime = [ghostState.getScaredTimer() for ghostState in oldGhostStates2]
+        scared = min(scaredTime)
+        if (ghostDistance < 3):
+            if (scared < 3):
+                addedScore -= 10000
+            # else:
+            #     addedScore += 10000
+
+        addedScore += (1/ghostDistance) * 5
+
+        # if distance to food is smaller than the previous distance, add food points
+        # if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
+        #     # aka, pacman is closer to food, increase points
+        #     addedScore += pacman.FOOD_POINTS
+        #     addedScore += pacman.FOOD_POINTS
+        #     addedScore += pacman.FOOD_POINTS
+
+        # if you're stopped, keep losing points
+        # if (currPosition == newPosition):
+        #     addedScore -= 50
+        
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # add in stuff to make pacman go towards ghost when they're scared/ ate a pellet
+        # useful stuff:
+        # newGhostStates = successorGameState.getGhostStates()
+        # newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        return state.getScore() + addedScore
