@@ -313,7 +313,71 @@ class ReflexCaptureAgent(CaptureAgent):
         # Q LEARNING IMPLEMENTATION
         # return self.getActionQLearning(gameState)
     
-    # EXPECTIMINIMAX IMPLEMENTATION
+    # # EXPECTIMINIMAX IMPLEMENTATION
+    # def getActionExpectiminimax(self, gameState):
+    #     # sentinal value
+    #     max = -9999999
+    #     returnAction = ''
+    #     # print(gameState.getLegalActions())
+    #     for action in gameState.getLegalActions(self.index):
+    #         # skip stop action
+    #         if action == Directions.STOP:
+    #             continue
+    #         # print(action, gameState.getLegalActions(self.index))
+    #         newState = gameState.generateSuccessor(self.index, action)
+    #         agentIndex = newState.getLastAgentMoved()
+    #         checkVal = self.expectiMininmax(
+    #             agentIndex + 1, newState, self.index, self.depth, True)
+    #         # finding the max value out of all actions
+    #         if checkVal > max:
+    #             max = checkVal
+    #             returnAction = action
+    #     # print(returnAction)
+    #     return returnAction
+
+    # # expectiminimax helper function
+    # def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance):
+    #     if gameState.isOver() or depth == maxDepth:
+    #         # print("here")
+    #         return self.evalFunction(gameState)
+        
+    #     # chance only if agentIndex is self.index
+    #     if not chance:
+    #         if agentIndex == self.index:
+    #             maxVal = -999999
+    #             for action in gameState.getLegalActions(agentIndex):
+    #                 # skips the stop action
+    #                 if action == Directions.STOP:
+    #                     continue
+    #                 newState = gameState.generateSuccessor(agentIndex, action)
+    #                 # for this section only finding the max value
+    #                 maxVal = max(maxVal, self.expectiMininmax(
+    #                     agentIndex + 1, newState, depth, maxDepth, True))
+    #             return maxVal
+    #     else:
+    #         # dependent on two possible states
+    #         # either value is less or more
+    #         if agentIndex == gameState.getNumAgents() - 1:
+    #             averageVal = 0
+    #             # averaging all the possible values
+    #             # node right before a max node
+    #             for action in gameState.getLegalActions(agentIndex):
+    #                 newState = gameState.generateSuccessor(agentIndex, action)
+    #                 averageVal += self.expectiMininmax(
+    #                     0, newState, depth + 1, maxDepth, False)
+    #             return averageVal / len(gameState.getLegalActions(agentIndex))
+    #         elif agentIndex % gameState.getNumAgents() != 0:
+    #             averageVal = 0
+    #             # averaging all the possible values
+    #             # node before more min nodes
+    #             for action in gameState.getLegalActions(agentIndex):
+    #                 newState = gameState.generateSuccessor(agentIndex, action)
+    #                 averageVal += self.expectiMininmax(
+    #                     agentIndex + 1, newState, depth, maxDepth, True)
+    #             return averageVal / len(gameState.getLegalActions(agentIndex))
+
+    #EXPECTIMAX JACKSON STYLE
+     # EXPECTIMINIMAX IMPLEMENTATION
     def getActionExpectiminimax(self, gameState):
         # sentinal value
         max = -9999999
@@ -533,8 +597,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
     def getFeatures(self, gameState, action):
         features = {}
-        print(gameState.getLegalActions(self.index))
-        print(gameState.getNumAgents())
+        # print(gameState.getLegalActions(self.index))
+        # print(gameState.getNumAgents())
         successor = self.getSuccessor(gameState, action)
         features['successorScore'] = self.getScore(successor)
 
