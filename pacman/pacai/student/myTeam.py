@@ -263,7 +263,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 3
+        self.depth = 4
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -421,8 +421,12 @@ class ReflexCaptureAgent(CaptureAgent):
                         continue
                     newState = gameState.generateSuccessor(agentIndex, action)
                     # for this section only finding the max value
-                    maxVal = max(maxVal, self.expectiMininmax(
-                        agentIndex + 1, newState, depth + 1, maxDepth, True))
+                    if(agentIndex == gameState.getNumAgents() - 1):
+                        maxVal = max(maxVal, self.expectiMininmax(
+                            0, newState, depth + 1, maxDepth, True))
+                    else:
+                        maxVal = max(maxVal, self.expectiMininmax(
+                            agentIndex+1, newState, depth + 1, maxDepth, True))
                 return maxVal
         else:
             # dependent on two possible states
@@ -731,23 +735,24 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 oldGhostStates.append(state.getAgentState(agent).getPosition())
                 oldGhostStates2.append(state.getAgentState(agent))
 
-        # distance b/w you & the closest ghost
-        ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
+        if oldGhostStates:
+            # distance b/w you & the closest ghost
+            ghostDistance = self.getMazeDistance(currPosition, oldGhostStates[0])
 
-        # go through list of all ghosts and find the one w/ the closest position
-        for i in oldGhostStates:
-            if (self.getMazeDistance(currPosition, i) < ghostDistance):
-                ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
+            # go through list of all ghosts and find the one w/ the closest position
+            for i in oldGhostStates:
+                if (self.getMazeDistance(currPosition, i) < ghostDistance):
+                    ghostDistance = self.getMazeDistance(currPosition, i)  # store the distance
 
-        scaredTime = [ghostState.getScaredTimer() for ghostState in oldGhostStates2]
-        scared = min(scaredTime)
-        if (ghostDistance < 3):
-            if (scared < 3):
-                addedScore -= 10000
-            # else:
-            #     addedScore += 10000
+            scaredTime = [ghostState.getScaredTimer() for ghostState in oldGhostStates2]
+            scared = min(scaredTime)
+            if (ghostDistance < 3):
+                if (scared < 3):
+                    addedScore -= 10000
+                # else:
+                #     addedScore += 10000
 
-        addedScore += (1/ghostDistance) * 5
+            addedScore += (1/ghostDistance) * 5
 
         # if distance to food is smaller than the previous distance, add food points
         # if (distance.manhattan(newPosition, closestFoodCoords) < foodDistance):
