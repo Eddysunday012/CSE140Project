@@ -263,7 +263,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 2
+        self.depth = 3
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -443,7 +443,7 @@ class ReflexCaptureAgent(CaptureAgent):
                 for action in gameState.getLegalActions(agentIndex):
                     newState = gameState.generateSuccessor(agentIndex, action)
                     averageVal += self.expectiMininmax(
-                        agentIndex + 1, newState, depth, maxDepth, True)
+                        agentIndex + 1, newState, depth + 1, maxDepth, True)
                 return averageVal / len(gameState.getLegalActions(agentIndex))
 
     # Q LEARNING IMPLEMENTATION
