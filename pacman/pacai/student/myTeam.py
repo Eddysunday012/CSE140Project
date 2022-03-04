@@ -263,7 +263,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 4
+        self.depth = 3
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
