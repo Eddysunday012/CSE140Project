@@ -263,7 +263,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 0
+        self.depth = 2
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -315,7 +315,7 @@ class ReflexCaptureAgent(CaptureAgent):
         finalAction = ""
         value = -999999
         for action in gameState.getLegalActions(agent):
-            value2 = self.jsexpectimax(gameState, agent + 1, depth, action, agent)
+            value2 = self.jsexpectimax(gameState, agent+1, depth, action, agent)
             if ((value2 > value) and (action != "Stop")):
                 value = value2
                 finalAction = action
@@ -498,11 +498,37 @@ class ReflexCaptureAgent(CaptureAgent):
     #             return averageVal / len(gameState.getLegalActions(agentIndex))
     }
 
-    def jsexpectimax(self, gameState, agentIndex, currentDepth, prevAction, ogAgent):
+    def jsexpectimax(self, gameState, agentIndex, currentDepth, prevAction, prevAgent):
         if (currentDepth == self.depth):
             return self.evaluate(gameState, prevAction)
 
-        newState = gameState.generateSuccessor(agentIndex, prevAction)
+        newState = gameState.generateSuccessor(prevAgent, prevAction)
+
+        if agentIndex == gameState.getNumAgents()-1:
+            nextAgent = 0
+        else:
+            nextAgent = agentIndex + 1
+
+        # newState = gameState.generateSuccessor(agentIndex, prevAction)
+
+        if agentIndex in self.getTeam(newState):
+            if agentIndex == self.index:
+                # add 1 to the depth
+                listOfVals = []
+                for action in newState.getLegalActions(agentIndex):
+                    listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth+1, action, agentIndex))
+                return max(listOfVals)
+            else:
+                # just regular eval
+                listOfVals = []
+                for action in newState.getLegalActions(agentIndex):
+                    listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex))
+                return max(listOfVals)
+        else:
+            averageVal = 0
+            for action in newState.getLegalActions(agentIndex):
+                averageVal += self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex)
+            return averageVal/len(newState.getLegalActions(agentIndex))
 
         
 
