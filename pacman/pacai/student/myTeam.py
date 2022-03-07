@@ -389,6 +389,33 @@ class ReflexCaptureAgent(CaptureAgent):
     #EXPECTIMAX with given features & weights
      # EXPECTIMINIMAX IMPLEMENTATION
     def getActionExpectiminimax(self, gameState):
+        # # sentinal value
+        # max = -9999999
+        # returnAction = ''
+        # # print(gameState.getLegalActions())
+        # for action in gameState.getLegalActions(self.index):
+        #     # skip stop action
+        #     if action == Directions.STOP:
+        #         continue
+        #     # print(action, gameState.getLegalActions(self.index))
+        #     newState = gameState.generateSuccessor(self.index, action)
+        #     agentIndex = self.index
+
+        #     if agentIndex == gameState.getNumAgents()-1:
+        #         checkVal = self.expectiMininmax(
+        #             0, newState, 0, self.depth, True, action)
+        #     else:
+        #         checkVal = self.expectiMininmax(
+        #             agentIndex + 1, newState, 0, self.depth, True, action)
+            
+        #     # finding the max value out of all actions
+        #     if checkVal > max:
+        #         max = checkVal
+        #         returnAction = action
+        # # print(returnAction)
+        # return returnAction
+
+        # -------------- julie messin around
         # sentinal value
         max = -9999999
         returnAction = ''
@@ -397,23 +424,15 @@ class ReflexCaptureAgent(CaptureAgent):
             # skip stop action
             if action == Directions.STOP:
                 continue
-            # print(action, gameState.getLegalActions(self.index))
-            newState = gameState.generateSuccessor(self.index, action)
-            agentIndex = self.index
-
-            if agentIndex == gameState.getNumAgents()-1:
-                checkVal = self.expectiMininmax(
-                    0, newState, 0, self.depth, True, action)
-            else:
-                checkVal = self.expectiMininmax(
-                    agentIndex + 1, newState, 0, self.depth, True, action)
             
-            # finding the max value out of all actions
-            if checkVal > max:
-                max = checkVal
+            if (self.evaluate(gameState, action) > max):
+                max = self.evaluate(gameState, action)
                 returnAction = action
+
         # print(returnAction)
         return returnAction
+        
+        
 
     # expectiminimax helper function
     def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance, lastAction):
@@ -423,8 +442,9 @@ class ReflexCaptureAgent(CaptureAgent):
             print(gameState.getLegalActions(agentIndex))
             if lastAction in gameState.getLegalActions(agentIndex):
                 return self.evaluate(gameState, lastAction)
-            else:
-                return -99999
+            #     return self.evalFunction(gameState)
+            # else:
+            #     return -99999
         
         # chance only if agentIndex is self.index
         if not chance:
@@ -854,6 +874,7 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
         currPosition = state.getAgentState(self.index).getPosition()  # current position of us
         #oldFood = self.getFoodYouAreDefending(state).asList()  # list of foods to defend
+
         oldState = self.getPreviousObservation()  # old position of us
 
         if oldState == None:
