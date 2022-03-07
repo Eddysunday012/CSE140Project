@@ -263,7 +263,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
-        self.depth = 3
+        self.depth = 0
 
     # MAIN ACTION FUNCTION
     def chooseAction(self, gameState):
@@ -306,15 +306,24 @@ class ReflexCaptureAgent(CaptureAgent):
 
 
         # EXPECTIMINIMAX IMPLEMENTATION
-        action = self.getActionExpectiminimax(gameState)
-        print(action)
-        return action
+        # action = self.getActionExpectiminimax(gameState)
+        # # print(action)
+        # return action
 
-        # Q LEARNING IMPLEMENTATION
-        # return self.getActionQLearning(gameState)
+        agent = self.index   # Gets current agent
+        depth = 0   # To check with final depth
+        finalAction = ""
+        value = -999999
+        for action in gameState.getLegalActions(agent):
+            value2 = self.jsexpectimax(gameState, agent + 1, depth, action, agent)
+            if ((value2 > value) and (action != "Stop")):
+                value = value2
+                finalAction = action
+        return finalAction
     
+    {
     # # EXPECTIMINIMAX IMPLEMENTATION
-    # def getActionExpectiminimax(self, gameState):
+    #def getActionExpectiminimax(self, gameState):
     #     # sentinal value
     #     max = -9999999
     #     returnAction = ''
@@ -385,108 +394,117 @@ class ReflexCaptureAgent(CaptureAgent):
     #                 averageVal += self.expectiMininmax(
     #                     agentIndex + 1, newState, depth + 1, maxDepth, True)
     #             return averageVal / len(gameState.getLegalActions(agentIndex))
+    }
+    {
+    # #EXPECTIMAX with given features & weights
+    #  # EXPECTIMINIMAX IMPLEMENTATION
+    # def getActionExpectiminimax(self, gameState):
+    #     # # sentinal value
+    #     # max = -9999999
+    #     # returnAction = ''
+    #     # # print(gameState.getLegalActions())
+    #     # for action in gameState.getLegalActions(self.index):
+    #     #     # skip stop action
+    #     #     if action == Directions.STOP:
+    #     #         continue
+    #     #     # print(action, gameState.getLegalActions(self.index))
+    #     #     newState = gameState.generateSuccessor(self.index, action)
+    #     #     agentIndex = self.index
 
-    #EXPECTIMAX with given features & weights
-     # EXPECTIMINIMAX IMPLEMENTATION
-    def getActionExpectiminimax(self, gameState):
-        # # sentinal value
-        # max = -9999999
-        # returnAction = ''
-        # # print(gameState.getLegalActions())
-        # for action in gameState.getLegalActions(self.index):
-        #     # skip stop action
-        #     if action == Directions.STOP:
-        #         continue
-        #     # print(action, gameState.getLegalActions(self.index))
-        #     newState = gameState.generateSuccessor(self.index, action)
-        #     agentIndex = self.index
-
-        #     if agentIndex == gameState.getNumAgents()-1:
-        #         checkVal = self.expectiMininmax(
-        #             0, newState, 0, self.depth, True, action)
-        #     else:
-        #         checkVal = self.expectiMininmax(
-        #             agentIndex + 1, newState, 0, self.depth, True, action)
+    #     #     if agentIndex == gameState.getNumAgents()-1:
+    #     #         checkVal = self.expectiMininmax(
+    #     #             0, newState, 0, self.depth, True, action)
+    #     #     else:
+    #     #         checkVal = self.expectiMininmax(
+    #     #             agentIndex + 1, newState, 0, self.depth, True, action)
             
-        #     # finding the max value out of all actions
-        #     if checkVal > max:
-        #         max = checkVal
-        #         returnAction = action
-        # # print(returnAction)
-        # return returnAction
+    #     #     # finding the max value out of all actions
+    #     #     if checkVal > max:
+    #     #         max = checkVal
+    #     #         returnAction = action
+    #     # # print(returnAction)
+    #     # return returnAction
 
-        # -------------- julie messin around
-        # sentinal value
-        max = -9999999
-        returnAction = ''
-        # print(gameState.getLegalActions())
-        for action in gameState.getLegalActions(self.index):
-            # skip stop action
-            if action == Directions.STOP:
-                continue
+    #     # -------------- julie messin around
+    #     # sentinal value
+    #     max = -9999999
+    #     returnAction = ''
+    #     # print(gameState.getLegalActions())
+    #     for action in gameState.getLegalActions(self.index):
+    #         # skip stop action
+    #         if action == Directions.STOP:
+    #             continue
             
-            if (self.evaluate(gameState, action) > max):
-                max = self.evaluate(gameState, action)
-                returnAction = action
+    #         if (self.evaluate(gameState, action) > max):
+    #             max = self.evaluate(gameState, action)
+    #             returnAction = action
 
-        # print(returnAction)
-        return returnAction
-        
-        
-
+    #     # print(returnAction)
+    #     return returnAction
+}   
+    {  
     # expectiminimax helper function
-    def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance, lastAction):
-        print("uhhhhh")
-        if gameState.isOver() or depth == maxDepth:
-            # print("here")
-            print(gameState.getLegalActions(agentIndex))
-            if lastAction in gameState.getLegalActions(agentIndex):
-                return self.evaluate(gameState, lastAction)
-            #     return self.evalFunction(gameState)
-            # else:
-            #     return -99999
+    # def expectiMininmax(self, agentIndex, gameState, depth, maxDepth, chance, lastAction):
+    #     print("uhhhhh")
+    #     if gameState.isOver() or depth == maxDepth:
+    #         # print("here")
+    #         print(gameState.getLegalActions(agentIndex))
+    #         if lastAction in gameState.getLegalActions(agentIndex):
+    #             return self.evaluate(gameState, lastAction)
+    #         #     return self.evalFunction(gameState)
+    #         # else:
+    #         #     return -99999
         
-        # chance only if agentIndex is self.index
-        if not chance:
-            if agentIndex == self.index:
-                maxVal = -999999
-                for action in gameState.getLegalActions(agentIndex):
-                    # skips the stop action
-                    if action == Directions.STOP:
-                        continue
-                    newState = gameState.generateSuccessor(agentIndex, action)
-                    # for this section only finding the max value
-                    if(agentIndex == gameState.getNumAgents() - 1):
-                        maxVal = max(maxVal, self.expectiMininmax(
-                            0, newState, depth + 1, maxDepth, True, action))
-                    else:
-                        maxVal = max(maxVal, self.expectiMininmax(
-                            agentIndex+1, newState, depth + 1, maxDepth, True, action))
-                return maxVal
-        else:
-            # dependent on two possible states
-            # either value is less or more
+    #     # chance only if agentIndex is self.index
+    #     if not chance:
+    #         if agentIndex == self.index:
+    #             maxVal = -999999
+    #             for action in gameState.getLegalActions(agentIndex):
+    #                 # skips the stop action
+    #                 if action == Directions.STOP:
+    #                     continue
+    #                 newState = gameState.generateSuccessor(agentIndex, action)
+    #                 # for this section only finding the max value
+    #                 if(agentIndex == gameState.getNumAgents() - 1):
+    #                     maxVal = max(maxVal, self.expectiMininmax(
+    #                         0, newState, depth + 1, maxDepth, True, action))
+    #                 else:
+    #                     maxVal = max(maxVal, self.expectiMininmax(
+    #                         agentIndex+1, newState, depth + 1, maxDepth, True, action))
+    #             return maxVal
+    #     else:
+    #         # dependent on two possible states
+    #         # either value is less or more
             
-            if agentIndex == gameState.getNumAgents() - 1:
-                print("here")
-                averageVal = 0
-                # averaging all the possible values
-                # node right before a max node
-                for action in gameState.getLegalActions(agentIndex):
-                    newState = gameState.generateSuccessor(agentIndex, action)
-                    averageVal += self.expectiMininmax(
-                        0, newState, depth + 1, maxDepth, False, action)
-                return averageVal / len(gameState.getLegalActions(agentIndex))
-            elif agentIndex % gameState.getNumAgents() != 0:
-                print("here2")
-                averageVal = 0
-                # averaging all the possible values
-                # node before more min nodes
-                for action in gameState.getLegalActions(agentIndex):
-                    newState = gameState.generateSuccessor(agentIndex, action)
-                    averageVal += self.expectiMininmax(
-                        agentIndex + 1, newState, depth + 1, maxDepth, True, action)
-                return averageVal / len(gameState.getLegalActions(agentIndex))
+    #         if agentIndex == gameState.getNumAgents() - 1:
+    #             print("here")
+    #             averageVal = 0
+    #             # averaging all the possible values
+    #             # node right before a max node
+    #             for action in gameState.getLegalActions(agentIndex):
+    #                 newState = gameState.generateSuccessor(agentIndex, action)
+    #                 averageVal += self.expectiMininmax(
+    #                     0, newState, depth + 1, maxDepth, False, action)
+    #             return averageVal / len(gameState.getLegalActions(agentIndex))
+    #         elif agentIndex % gameState.getNumAgents() != 0:
+    #             print("here2")
+    #             averageVal = 0
+    #             # averaging all the possible values
+    #             # node before more min nodes
+    #             for action in gameState.getLegalActions(agentIndex):
+    #                 newState = gameState.generateSuccessor(agentIndex, action)
+    #                 averageVal += self.expectiMininmax(
+    #                     agentIndex + 1, newState, depth + 1, maxDepth, True, action)
+    #             return averageVal / len(gameState.getLegalActions(agentIndex))
+    }
+
+    def jsexpectimax(self, gameState, agentIndex, currentDepth, prevAction, ogAgent):
+        if (currentDepth == self.depth):
+            return self.evaluate(gameState, prevAction)
+
+        newState = gameState.generateSuccessor(agentIndex, prevAction)
+
+        
 
     # Q LEARNING IMPLEMENTATION
     def getQValue(self, state, action):
