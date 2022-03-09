@@ -324,7 +324,7 @@ class ReflexCaptureAgent(CaptureAgent):
         if len(gameState.getLegalActions(agent)) <= 3 :
             self.depth = 2
         else:
-            self.depth = 2
+            self.depth = 1
         for action in gameState.getLegalActions(agent):
             value2 = self.jsexpectimax(gameState, agent, depth, action, -999999, 999999)
             if ((value2 > value) and (action != "Stop")):
@@ -534,7 +534,7 @@ class ReflexCaptureAgent(CaptureAgent):
                         listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth+1, action, alpha, beta))
                         if max(listOfVals) > alpha:
                             alpha = max(listOfVals)
-                        if max(listOfVals) >= beta:
+                        if alpha >= beta:
                             return max(listOfVals)
                 if (listOfVals):
                     return max(listOfVals)
@@ -549,7 +549,7 @@ class ReflexCaptureAgent(CaptureAgent):
                         listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, alpha, beta))
                         if max(listOfVals) > alpha:
                             alpha = max(listOfVals)
-                        if max(listOfVals) >= beta:
+                        if alpha >= beta:
                             return max(listOfVals)
                 if (listOfVals):
                     return max(listOfVals)
@@ -562,10 +562,10 @@ class ReflexCaptureAgent(CaptureAgent):
             for action in newState.getLegalActions(nextAgent):
                 if action != "Stop":
                     listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, alpha, beta))
-                    if max(listOfVals) < alpha:
-                            beta = max(listOfVals)
-                    if max(listOfVals) <= alpha:
-                        return max(listOfVals)
+                    if min(listOfVals) < beta:
+                            beta = min(listOfVals)
+                    if beta <= alpha:
+                        return min(listOfVals)
             if (listOfVals):
                 return min(listOfVals)
             else:
