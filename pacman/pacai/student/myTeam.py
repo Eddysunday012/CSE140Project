@@ -321,12 +321,16 @@ class ReflexCaptureAgent(CaptureAgent):
         depth = 0   # To check with final depth
         finalAction = ""
         value = -999999
+        if len(gameState.getLegalActions(agent)) <= 3 :
+            self.depth = 0
+        else:
+            self.depth = 2
         for action in gameState.getLegalActions(agent):
             value2 = self.jsexpectimax(gameState, agent, depth, action, agent)
             if ((value2 > value) and (action != "Stop")):
                 value = value2
                 finalAction = action
-        # print(finalAction)
+        print(finalAction)
         return finalAction
     
     {
@@ -526,21 +530,37 @@ class ReflexCaptureAgent(CaptureAgent):
                 # add 1 to the depth
                 listOfVals = []
                 for action in newState.getLegalActions(nextAgent):
-                    listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth+1, action, agentIndex))
-                return max(listOfVals)
+                    if action != "Stop":
+                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth+1, action, agentIndex))
+                if (listOfVals):
+                    return max(listOfVals)
+                else:
+                    return -99
             else:
                 # print("regular eval")
                 # just regular eval
                 listOfVals = []
                 for action in newState.getLegalActions(nextAgent):
-                    listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex))
-                return max(listOfVals)
+                    if action != "Stop":
+                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex))
+                if (listOfVals):
+                    return max(listOfVals)
+                else:
+                    return -99
         else:
             # print("enenememy?")
             averageVal = 0
+            listOfVals = []
             for action in newState.getLegalActions(nextAgent):
-                averageVal += self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex)
-            return averageVal/len(newState.getLegalActions(agentIndex))
+                if action != "Stop":
+                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex))
+            if (listOfVals):
+                return min(listOfVals)
+            else:
+                return 99
+            #     if action != "Stop":
+            #         averageVal += self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex)
+            # return averageVal/len(newState.getLegalActions(agentIndex))
 
 
 
