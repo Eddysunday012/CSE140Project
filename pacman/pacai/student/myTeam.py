@@ -322,15 +322,15 @@ class ReflexCaptureAgent(CaptureAgent):
         finalAction = ""
         value = -999999
         if len(gameState.getLegalActions(agent)) <= 3 :
-            self.depth = 0
+            self.depth = 2
         else:
             self.depth = 2
         for action in gameState.getLegalActions(agent):
-            value2 = self.jsexpectimax(gameState, agent, depth, action, agent)
+            value2 = self.jsexpectimax(gameState, agent, depth, action, -999999, 999999)
             if ((value2 > value) and (action != "Stop")):
                 value = value2
                 finalAction = action
-        print(finalAction)
+        # print(finalAction)
         return finalAction
     
     {
@@ -510,7 +510,7 @@ class ReflexCaptureAgent(CaptureAgent):
     #             return averageVal / len(gameState.getLegalActions(agentIndex))
     }
 
-    def jsexpectimax(self, gameState, agentIndex, currentDepth, prevAction, prevAgent):
+    def jsexpectimax(self, gameState, agentIndex, currentDepth, prevAction, alpha, beta):
         if (currentDepth >= self.depth):
             return self.evaluate(gameState, prevAction)
 
@@ -531,7 +531,11 @@ class ReflexCaptureAgent(CaptureAgent):
                 listOfVals = []
                 for action in newState.getLegalActions(nextAgent):
                     if action != "Stop":
-                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth+1, action, agentIndex))
+                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth+1, action, alpha, beta))
+                        if max(listOfVals) > alpha:
+                            alpha = max(listOfVals)
+                        if max(listOfVals) >= beta:
+                            return max(listOfVals)
                 if (listOfVals):
                     return max(listOfVals)
                 else:
@@ -542,7 +546,11 @@ class ReflexCaptureAgent(CaptureAgent):
                 listOfVals = []
                 for action in newState.getLegalActions(nextAgent):
                     if action != "Stop":
-                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex))
+                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, alpha, beta))
+                        if max(listOfVals) > alpha:
+                            alpha = max(listOfVals)
+                        if max(listOfVals) >= beta:
+                            return max(listOfVals)
                 if (listOfVals):
                     return max(listOfVals)
                 else:
@@ -553,7 +561,11 @@ class ReflexCaptureAgent(CaptureAgent):
             listOfVals = []
             for action in newState.getLegalActions(nextAgent):
                 if action != "Stop":
-                        listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, agentIndex))
+                    listOfVals.append(self.jsexpectimax(newState, nextAgent, currentDepth, action, alpha, beta))
+                    if max(listOfVals) < alpha:
+                            beta = max(listOfVals)
+                    if max(listOfVals) <= alpha:
+                        return max(listOfVals)
             if (listOfVals):
                 return min(listOfVals)
             else:
@@ -919,6 +931,9 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
         if (len(invaders) > 0):
             dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
+            features['invaderDistance'] = min(dists)
+        else:
+            dists = [self.getMazeDistance(myPos, a.getPosition()) for a in enemies]
             features['invaderDistance'] = min(dists)
 
         if (action == Directions.STOP):
